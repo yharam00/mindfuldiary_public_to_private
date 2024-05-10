@@ -27,10 +27,9 @@ import book_blue from "../img/book_blue.jpg";
 import book_purple from "../img/book_purple.jpg";
 import chat from "../img/chat.jpg";
 import lock from "../img/lock.jpg";
-import {selectOptions} from "@testing-library/user-event/dist/select-options";
 import config from "./backend_url.js";
 
-const haram_change = config.ngrok_8000;
+const haram_change = config.localhost;
 
 function Writing(props) {
     const [show, setShow] = useState(false);
@@ -52,7 +51,6 @@ function Writing(props) {
     const diaryRequest = useRef(false)
 
     const [modalShow, setModalShow] = useState(false);
-    const [modalShow2, setModalShow2] = useState(false);
     const [isListening, setIsListening] = useState(false);
     const [textInput, setTextInput] = useState('');
     const notSpoken = useRef(true)
@@ -69,19 +67,7 @@ function Writing(props) {
     const phq7 = useRef(null)
     const phq8 = useRef(null)
     const phq9 = useRef(null)
-    const riskLevel = useRef(null)
-    const [riskMethod, setRiskMethod] = useState(null)
-    const [phqTotal, setPhqTotal] = useState(null)
-    const [displayNewQuestion, setDisplayNewQuestion] = useState(false)
-    const [checkedItems, setCheckedItems] = useState({
-        suicide: false,
-        selfharm: false
-    });
-    const [reflection, setReflection] = useState(null)
-    const micUsage = useRef(0)
-
-    const risk_sent = useRef(false)
-
+    let [phqTotal, setPhqTotal] = useState(null)
 
     // voice input feature
     useEffect(() => {
@@ -178,7 +164,7 @@ function Writing(props) {
     const currentTime = new Date();
     const currentHour = currentTime.getHours();
 
-    // const isEvening = currentHour >= 19 && currentHour < 24;
+    // const isEvening = currentHour >= 10 && currentHour < 24;
     const isEvening = true;
 
 
@@ -202,7 +188,7 @@ function Writing(props) {
                 await setDoc(doc(db, "session", props.userMail, "diary", session), {
                     outputFromLM: {
                         "options": [myArray[Math.floor(Math.random() * myArray.length)]],
-                        "module": "Rapport building",
+                        "module": "Initiation",
                         "summary": "none",
                         "diary": "none"
                     },
@@ -219,12 +205,6 @@ function Writing(props) {
                     sessionNumber: session,
                     history_operator: [],
                     reviewMode: "W",
-                    phq9score: phq1.current + phq2.current + phq3.current + phq4.current + phq5.current + phq6.current + phq6.current + phq7.current + phq8.current + phq9.current,
-                    phq_item_score: [phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8, phq9],
-                    riskLevel: riskLevel.current,
-                    riskType: checkedItems,
-                    riskMethod: riskMethod
-
                 });
             }
             setSessionStatus(true)
@@ -243,45 +223,34 @@ function Writing(props) {
                     setLoading(true)
                 }
             } else {
-                let myArray
-                if (riskLevel.current === 9 && checkedItems['suicide'] === true) {
-                    sendEmail_preWriting()
-                    setModalShow2(true)
-                } else {
-                    myArray = ["만나서 반가워요, 오늘 하루 어떻게 지내셨나요?", "오늘 하루 어땠어요? 말하고 싶은 것이 있다면 자유롭게 이야기해주세요.", "안녕하세요! 오늘 하루는 어땠나요?", "오늘 하루도 정말 고생 많으셨어요. 어떤 일이 있었는지 얘기해주세요.", "오늘도 무사히 지나간 것에 감사한 마음이 드네요. 오늘 하루는 어땠나요?", "오늘은 어떤 새로운 것을 경험했나요? 무엇을 경험했는지 얘기해주세요.", "오늘은 어떤 고민이 있었나요? 저와 함께 고민을 얘기해봐요."]
-
-                    await setDoc(doc(db, "session", props.userMail, "diary", newSession), {
-                        outputFromLM: {
-                            "options": [myArray[Math.floor(Math.random() * myArray.length)]],
-                            "module": "Rapport building",
-                            "summary": "none",
-                            "diary": "none"
-                        },
-                        conversation: [],
-                        isFinished: false,
-                        module: "",
-                        fiveOptionFromLLM: [],
-                        diary: "",
-                        topic: "",
-                        sessionStart: Math.floor(Date.now() / 1000),
-                        summary: "",
-                        history: [],
-                        turn: 0,
-                        sessionNumber: newSession,
-                        history_operator: [],
-                        reviewMode: "W",
-                        phq9score: phq1.current + phq2.current + phq3.current + phq4.current + phq5.current + phq6.current + phq6.current + phq7.current + phq8.current + phq9.current,
-                        phq_item_score: [phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8, phq9],
-                        riskLevel: riskLevel.current,
-                        riskType: checkedItems,
-                        riskMethod: riskMethod
-
-                    });
-                    setSessionStatus(true)
-                    setLoading(true)
-                }
+                const myArray = ["만나서 반가워요, 오늘 하루 어떻게 지내셨나요?", "오늘 하루 어땠어요? 말하고 싶은 것이 있다면 자유롭게 이야기해주세요.", "안녕하세요! 오늘 하루는 어땠나요?", "오늘 하루도 정말 고생 많으셨어요. 어떤 일이 있었는지 얘기해주세요.", "오늘도 무사히 지나간 것에 감사한 마음이 드네요. 오늘 하루는 어땠나요?", "오늘은 어떤 새로운 것을 경험했나요? 무엇을 경험했는지 얘기해주세요.", "오늘은 어떤 고민이 있었나요? 저와 함께 고민을 얘기해봐요."]
+                await setDoc(doc(db, "session", props.userMail, "diary", newSession), {
+                    outputFromLM: {
+                        "options": [myArray[Math.floor(Math.random() * myArray.length)]],
+                        "module": "Initiation",
+                        "summary": "none",
+                        "diary": "none"
+                    },
+                    conversation: [],
+                    isFinished: false,
+                    module: "",
+                    fiveOptionFromLLM: [],
+                    diary: "",
+                    topic: "",
+                    sessionStart: Math.floor(Date.now() / 1000),
+                    summary: "",
+                    history: [],
+                    turn: 0,
+                    sessionNumber: newSession,
+                    history_operator: [],
+                    reviewMode: "W",
+                });
             }
+            setSessionStatus(true)
+            setLoading(true)
         }
+
+
     }
 
     async function submitDiary() {
@@ -293,7 +262,6 @@ function Writing(props) {
             diary: diary
         }, {merge: true});
         // navigateToReview()
-        // setSurveyReady(true)
         setSurveyReady(true)
     }
 
@@ -303,7 +271,7 @@ function Writing(props) {
             isFinished: true,
             like: 0,
             muscle: 0,
-            diary: "오늘의 일기 쓰기 완료! 오늘 작성한 다이어리는 보이지 않아요",
+            diary: "오늘 작성한 다이어리는 숨기고 싶어요",
             diary_hidden: diary
         }, {merge: true});
         setSurveyReady(true)
@@ -311,32 +279,11 @@ function Writing(props) {
     }
 
     async function endSession() {
-        setDoc(doc(db, "session", props.userMail, "diary", session), {
+        await setDoc(doc(db, "session", props.userMail, "diary", session), {
             phq9score: phqTotal,
-            phq_item_score: [phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8, phq9],
-            riskLevel: riskLevel.current,
-            riskMethod: riskMethod,
-            reflection: reflection,
-            isFinished: true
+            phq_item_score: [phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8, phq9]
         }, {merge: true});
-        await navigateToReview()
-    }
-
-    async function endSession_risk() {
-        setDoc(doc(db, "session", props.userMail, "diary", session), {
-            phq9score: phqTotal,
-            phq_item_score: [phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8, phq9],
-            riskLevel: riskLevel.current,
-            riskMethod: riskMethod,
-            riskType: checkedItems,
-            isFinished: true,
-            like: 0,
-            muscle: 0,
-            diary: "오늘의 일기 쓰기 완료! 오늘 작성한 다이어리는 보이지 않아요",
-            diary_hidden: diary,
-            sessionEnd: Math.floor(Date.now() / 1000)
-        }, {merge: true});
-        await navigateToReview()
+        navigateToReview()
     }
 
     async function editDiary(diary_edit) {
@@ -350,7 +297,7 @@ function Writing(props) {
     };
 
 
-    // Modal management
+    // Moaal management
     function navigateToReview() {
         navigate("/list")
     }
@@ -367,32 +314,6 @@ function Writing(props) {
         setTimeout(() => {
             submitDiary2();
         }, 500);
-    }
-
-    function MyVerticallyCenteredModal_risk(props) {
-        return (
-            <Modal
-                {...props}
-                size="lg"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title id="contained-modal-title-vcenter">
-                        마음챙김 다이어리
-                    </Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <h5>마음일기 사용 중 힘든 상황이 확인됩니다.</h5>
-                    <p>정말 걱정돼요. 지금 힘든 상황이며 긴급한 도움이 필요한 것 같습니다. 오늘은 일기를 쓰기보다, 상태를 돌아보시고 지금 견디기 힘든 상황을 겪고 있다면 언제든지 응급실 혹은
-                        병원에 도움을 요청해보세요.</p>
-                    <p>괜찮아졌을 때 우리 다시 만나요. 자살예방 상담전화 1393.</p>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick={endSession_risk}>오늘은 일찍 종료하고, 다음에 다시 만나요</Button>
-                </Modal.Footer>
-            </Modal>
-        );
     }
 
 
@@ -423,31 +344,13 @@ function Writing(props) {
         );
     }
 
-    const handleChange = (event) => {
-        setCheckedItems({...checkedItems, [event.target.value]: event.target.checked});
-    };
 
     // checking Prompt exist
     async function getLastSentence(response) {
         let a = setTimeout(() => {
             setModule(response["module"])
             setPrompt(response["options"][0])
-            if (module === "Risky situations") {
-                setSessionStatus(false)
-                setModalShow2(true)
-                if (risk_sent.current === false) {
-                    sendEmail_inWriting()
-                    risk_sent.current = true
-                }
-            }
             if (prompt) {
-                if (module === "Sensitive topic") {
-                    if (risk_sent.current === false) {
-                        sendEmail_inWriting()
-                        risk_sent.current = true
-                    }
-
-                }
                 if ((prompt).trim() === "") {
                     setLoading(true)
                 } else {
@@ -469,7 +372,7 @@ function Writing(props) {
             console.log(docSnap.data())
             const turn_temp = docSnap.data().turn
             requestPrompt(readyRequest, props.userMail, session, turn_temp, module)
-            if (turn_temp > 3) {
+            if (turn_temp > 2) {
                 console.log("다이어리 요청 들어감");
                 diaryInit(readyRequest, props.userMail, session);
                 diaryRequest.current = true;
@@ -479,10 +382,6 @@ function Writing(props) {
             console.log("No such document!");
         }
     }
-
-    // https://mindfuljournal-fzesr.run.goorm.site
-    // http://0.0.0.0:8000
-
 
     function requestPrompt(text, user, num, turn, module, model) {
         return fetch(haram_change+'/standalone', {
@@ -499,23 +398,6 @@ function Writing(props) {
             .catch(err => console.log(err));
     }
 
-
-    function requestPrompt_sensitive(text, user, num, turn, module, model) {
-        return fetch(haram_change+'/standalone_sensitive', {
-            method: 'POST',
-            body: JSON.stringify({
-                'text': text,
-                'user': user,
-                'num': num,
-                'turn': turn,
-                'module': module,
-                'model': "none"
-            })
-        })
-            .catch(err => console.log(err));
-    }
-
-
     function Unix_timestamp(t) {
         var date = new Date(t * 1000);
         var year = date.getFullYear();
@@ -528,14 +410,13 @@ function Writing(props) {
     }
 
     function PreviewComponent() {
-
         return (
             <>
                 <p>
                     각 질문 문항에 대해 체크해주세요
                 </p>
                 <div className="grid">
-                    <p>기분이 가라앉거나, 우울하거나, 희망이 없다고 느꼈다.</p>
+                    <p>1. 기분이 가라앉거나, 우울하거나, 희망이 없다고 느꼈다.</p>
                     <Likert
                         id="1"
                         responses={[
@@ -547,7 +428,7 @@ function Writing(props) {
                         onChange={(val) => phq1.current = val["value"]}
                     />
                     &nbsp;
-                    <p>평소 하던 일에 대한 흥미가 없어지거나 즐거움을 느끼지 못했다.</p>
+                    <p>2. 평소 하던 일에 대한 흥미가 없어지거나 즐거움을 느끼지 못했다.</p>
                     <Likert
                         id="2"
                         responses={[
@@ -560,7 +441,7 @@ function Writing(props) {
 
                     />
                     &nbsp;
-                    <p>잠들기가 어렵거나 자주 깼다/혹은 너무 많이 잤다.</p>
+                    <p>3. 잠들기가 어렵거나 자주 깼다/혹은 너무 많이 잤다.</p>
                     <Likert
                         id="3"
                         responses={[
@@ -573,7 +454,7 @@ function Writing(props) {
 
                     />
                     &nbsp;
-                    <p>평소보다 식욕이 줄었다/혹은 평소보다 많이 먹었다.</p>
+                    <p>4. 평소보다 식욕이 줄었다/혹은 평소보다 많이 먹었다.</p>
                     <Likert
                         id="4"
                         responses={[
@@ -586,7 +467,7 @@ function Writing(props) {
 
                     />
                     &nbsp;
-                    <p>다른 사람들이 눈치 챌 정도로 평소보다 말과 행동 이 느려졌다/혹은 너무 안절부절 못해서 가만히 앉아있을 수 없었다.</p>
+                    <p>5. 다른 사람들이 눈치 챌 정도로 평소보다 말과 행동 이 느려졌다/혹은 너무 안절부절 못해서 가만히 앉아있을 수 없었다.</p>
                     <Likert
                         id="5"
                         responses={[
@@ -599,7 +480,7 @@ function Writing(props) {
 
                     />
                     &nbsp;
-                    <p>피곤하고 기운이 없었다.</p>
+                    <p>6. 피곤하고 기운이 없었다.</p>
                     <Likert
                         id="6"
                         responses={[
@@ -612,7 +493,7 @@ function Writing(props) {
 
                     />
                     &nbsp;
-                    <p>내가 잘못 했거나, 실패했다는 생각이 들었다/혹은 자신과 가족을 실망시켰다고 생각했다.</p>
+                    <p>7. 내가 잘못 했거나, 실패했다는 생각이 들었다/혹은 자신과 가족을 실망시켰다고 생각했다.</p>
                     <Likert
                         id="7"
                         responses={[
@@ -625,7 +506,7 @@ function Writing(props) {
 
                     />
                     &nbsp;
-                    <p>신문을 읽거나 TV를 보는 것과 같은 일상적인 일에도 집중할 수가 없었다.</p>
+                    <p>8. 신문을 읽거나 TV를 보는 것과 같은 일상적인 일에도 집중할 수가 없었다.</p>
                     <Likert
                         id="8"
                         responses={[
@@ -638,7 +519,7 @@ function Writing(props) {
 
                     />
                     &nbsp;
-                    <p>차라리 죽는 것이 더 낫겠다고 생각했다/혹은 자해할 생각을 했다.</p>
+                    <p>9. 차라리 죽는 것이 더 낫겠다고 생각했다/혹은 자해할 생각을 했다.</p>
                     <Likert
                         id="9"
                         responses={[
@@ -648,52 +529,8 @@ function Writing(props) {
                             {value: 3, text: "거의 항상 그렇다"}
                         ]}
                         onChange={(val) => phq9.current = val["value"]}
+
                     />
-                    &nbsp;
-                    <p>직전 다이어리 작성 이후, 자해 또는 자살을 시도한 적이 있나요</p>
-                    <Likert
-                        id="10"
-                        responses={[
-                            {value: 0, text: "아니다"},
-                            {value: 1, text: "그렇다"}
-                        ]}
-                        onChange={(val) => {
-                            riskLevel.current = val["value"];
-                            if (val["value"] === 1) {
-                                setDisplayNewQuestion(true);
-                            } else {
-                                setDisplayNewQuestion(false);
-                            }
-                        }}
-                    />
-                    {displayNewQuestion &&
-                        <>
-                            <p>무엇을 시도했나요?<br/>
-                                <label>
-                                    <input type="checkbox" value="suicide" checked={checkedItems.suicide}
-                                           onChange={handleChange}/>
-                                </label> 자살
-                                &nbsp;&nbsp;
-                                <label>
-                                    <input type="checkbox" value="selfharm" checked={checkedItems.selfharm}
-                                           onChange={handleChange}/>
-                                </label> 자해</p>
-
-
-                            <p>어떤방법으로 시도했나요</p>
-                            <Form.Control
-                                type="text"
-                                as="textarea"
-                                rows={3}
-                                id="userInput"
-                                value={riskMethod}
-                                onChange={(e) => setRiskMethod(e.target.value)}
-                            />
-                            &nbsp;
-                        </>
-                    }
-
-
                 </div>
             </>
         );
@@ -728,116 +565,22 @@ function Writing(props) {
             .catch(err => console.log(err));
     }
 
-    function sendEmail(session) {
-        let risk_person = ["0824jl@naver.com"];
-        let to
+    function sendEmail() {
+        const to = 'taewan@kaist.ac.kr';
+    const subject = '[마음챙김]' + props.userMail + '새로운 일기 작성 ';
+    const body = '새로운 일기가 작성됨. 사용자id: ' + props.userMail;
 
-        if (risk_person.includes(props.userMail)) {
-            to = ['taewankim@snu.ac.kr', 'ikarosforeve@naver.com', 'twave09@naver.com']
-        }
-        else {
-            to = 'taewankim@snu.ac.kr';
-        }
-
-
-        let pStatus = "정의안됨"
-        if (riskLevel.current === 1 && checkedItems['suicide'] === true) {
-            pStatus = "!응급군!"
-            to = ['taewankim@snu.ac.kr', 'ikarosforeve@naver.com', 'twave09@naver.com']
-        } else if (phq9.current === 3 || checkedItems['selfharm'] === true) {
-            pStatus = "위험군"
-            to = ['taewankim@snu.ac.kr', 'ikarosforeve@naver.com', 'twave09@naver.com']
-        } else {
-            pStatus = "관리군"
-        }
-        const check = "https://pilot-operator.vercel.app/writing?userName=" + props.userMail + "&session=" + session
-        const subject = '[마음챙김][' + pStatus + "]" + props.userName + props.userMail;
-        const body = '사용자id: ' + props.userMail + '\n환자 이름: ' + props.userName + '\n세션번호: ' + session + '\nPHQ총점: ' + phqTotal + "\n위험정도\nPHQ9번: " + phq9.current + "\n자살/자해시도: " + riskLevel.current + "\n자살시도: " + checkedItems['suicide'] + "\n자해시도: " + checkedItems['selfharm'] + "\n방법: " + riskMethod + "\n실시간 대화내용: " + check;
-
-        fetch('https://algodiary--xpgmf.run.goorm.site/send-email', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({to, subject, body}),
-        })
-            .then(response => response.json())
-            .then(data => console.log(data))
-            .catch((error) => console.error('Error:', error));
-    }
-
-    function sendEmail_inWriting() {
-        let risk_person = ["0824jl@naver.com"];
-        let to
-
-        if (risk_person.includes(props.userMail)) {
-            to = ['taewankim@snu.ac.kr', 'ikarosforeve@naver.com']
-        }
-        else {
-            to = ['taewankim@snu.ac.kr', 'ikarosforeve@naver.com']
-        }
-
-        let pStatus = "정의안됨"
-        if (riskLevel.current === 1 && checkedItems['suicide'] === true) {
-            pStatus = "!응급군!"
-            // to = ['taewankim@snu.ac.kr', 'ikarosforeve@naver.com', 'twave09@naver.com']
-        } else if (phq9.current === 3 || checkedItems['selfharm'] === true) {
-            pStatus = "위험군"
-            // to = ['taewankim@snu.ac.kr', 'ikarosforeve@naver.com']
-        } else {
-            pStatus = "관리군"
-        }
-        const check = "https://pilot-operator.vercel.app/writing?userName=" + props.userMail + "&session=" + session
-        const subject = '[작성중_위험감지][' + pStatus + "]" + props.userName + props.userMail;
-        const body = '사용자id: ' + props.userMail + '\n환자 이름: ' + props.userName + '\n세션번호: ' + session + '\nPHQ총점: ' + phqTotal + "\n위험정도\nPHQ9번: " + phq9.current + "\n자살/자해시도: " + riskLevel.current + "\n자살시도: " + checkedItems['suicide'] + "\n자해시도: " + checkedItems['selfharm'] + "\n방법: " + riskMethod + "\n실시간 대화내용: " + check;
-
-        fetch('https://algodiary--xpgmf.run.goorm.site/send-email', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({to, subject, body}),
-        })
-            .then(response => response.json())
-            .then(data => console.log(data))
-            .catch((error) => console.error('Error:', error));
-    }
-
-    function sendEmail_preWriting() {
-        let risk_person = ["0824jl@naver.com"];
-        let to
-
-        if (risk_person.includes(props.userMail)) {
-            to = ['taewankim@snu.ac.kr', 'ikarosforeve@naver.com']
-        }
-        else {
-            to = ['taewankim@snu.ac.kr', 'ikarosforeve@naver.com']
-        }
-
-        let pStatus = "정의안됨"
-        if (riskLevel.current === 1 && checkedItems['suicide'] === true) {
-            pStatus = "!응급군!"
-            // to = ['taewankim@snu.ac.kr', 'ikarosforeve@naver.com', 'twave09@naver.com']
-        } else if (phq9.current === 3 || checkedItems['selfharm'] === true) {
-            pStatus = "위험군"
-            // to = ['taewankim@snu.ac.kr', 'ikarosforeve@naver.com']
-        } else {
-            pStatus = "관리군"
-        }
-        const check = "https://pilot-operator.vercel.app/writing?userName=" + props.userMail + "&session=" + session
-        const subject = '[위험감지_세션시작안됨][' + pStatus + "]" + props.userName + props.userMail;
-        const body = '사용자id: ' + props.userMail + '\n환자 이름: ' + props.userName + '\n세션번호: ' + session + '\nPHQ총점: ' + phqTotal + "\n위험정도\nPHQ9번: " + phq9.current + "\n자살/자해시도: " + riskLevel.current + "\n자살시도: " + checkedItems['suicide'] + "\n자해시도: " + checkedItems['selfharm'] + "\n방법: " + riskMethod + "\n실시간 대화내용: " + check;
-
-        fetch('https://algodiary--xpgmf.run.goorm.site/send-email', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({to, subject, body}),
-        })
-            .then(response => response.json())
-            .then(data => console.log(data))
-            .catch((error) => console.error('Error:', error));
+    // fetch('https://algodiary--xpgmf.run.goorm.site/send-email', {
+    fetch(haram_change, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ to, subject, body }),
+    })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch((error) => console.error('Error:', error));
     }
 
 
@@ -851,7 +594,7 @@ function Writing(props) {
         } else if (phqTotal >= 10 && phqTotal <= 19) {
             return "정말 많이 힘들어보여요. 전문적인 상담이나 치료가 필요할 것 같아요. 우리 함께 힘내보아요";
         } else if (phqTotal >= 20 && phqTotal <= 27) {
-            return "정말 힘드신 것 같습니다. 전문가의 도움이 꼭 필요합니다. 1393 또는 1588-9191에서도 도움을 받으실 수 있습니다.";
+            return "정말 힘드신 것 같습니다. 전문가의 도움이 꼭 필요합니다. 1588-9191에서도 도움을 받으실 수 있습니다.";
         } else {
             return "오류가 발생했어요";
         }
@@ -881,7 +624,6 @@ function Writing(props) {
                     conversation: message,
                     outputFromLM: "",
                     history: history,
-                    micUsage: micUsage.current
                 }, {merge: true});
                 await updateDoc(docRef2, {
                     turn: increment(1)
@@ -907,10 +649,10 @@ function Writing(props) {
                     <Row>
                         <div className="loading_box">
                         <span className="desktop-view">
-                            {date}<br/><b>먼저 나의 마음상태를 확인해봐요</b> 😀
+                            {date}<br/><b>오늘 나의 마음상태를 확인해봐요</b> 😀
                         </span>
                             <span className="smartphone-view">
-                            {date}<br/><b>먼저 마음상태를<br/>확인해봐요</b> 😀
+                            {date}<br/><b>오늘 마음상태를<br/>확인해봐요</b> 😀
                         </span>
                         </div>
                     </Row>
@@ -920,20 +662,10 @@ function Writing(props) {
                             <Button
                                 variant="primary"
                                 style={{backgroundColor: "007AFF", fontWeight: "600"}}
-                                onClick={async () => {
-                                    if (phq1.current !== null && phq2.current !== null && phq3.current !== null && phq4.current !== null && phq5.current !== null && phq6.current !== null && phq7.current !== null && phq8.current !== null && phq9.current !== null) {
-                                        setSurveyReady(false)
-                                        setPhqTotal(phq1.current + phq2.current + phq3.current + phq4.current + phq5.current + phq6.current + phq7.current + phq8.current + phq9.current)
-                                        const newSession = String(Math.floor(Date.now() / 1000));
-                                        setSession(newSession)
-                                        await sendEmail(newSession)
-                                        await createNewDoc(newSession)
-                                    } else {
-                                        alert("응답이 완료되지 않은 문항이 있습니다. 확인해주세요.")
-                                    }
-
+                                onClick={() => {
+                                    setPhqTotal(phq1.current + phq2.current + phq3.current + phq4.current + phq5.current + phq6.current + phq6.current + phq7.current + phq8.current + phq9.current)
                                 }}
-                            >🌤️ 일기 작성하기
+                            >🌤️오늘의 마음상태 확인하기
                             </Button>
                         </Col>
                     </Row>
@@ -970,27 +702,6 @@ function Writing(props) {
                         <span className="desktop-view">
                          <b>🗓️ 오늘의 일기<br/></b>
                             {diary}<br/> <br/>
-
-                            <div className="writing_box">
-                    <Form.Label htmlFor="userInput">
-                       <span className="desktop-view">
-                            ✏️ 일기를 쓰며 느낀점, 들었던 생각, 다짐이 있다면 자유롭게 남겨주세요
-                        </span>
-                        <span className="smartphone-view-text-tiny">
-                            ✏️ 일기를 쓰며 느낀점, 들었던 생각, 다짐이 있다면 자유롭게 남겨주세요
-                        </span>
-                    </Form.Label>
-                    <Form.Control
-                        type="text"
-                        as="textarea"
-                        rows={3}
-                        id="userInput"
-                        value={reflection}
-                        onChange={(e) => setReflection(e.target.value)}
-                    />
-                </div>
-
-
                             <Button
                                 variant="primary"
                                 style={{backgroundColor: "007AFF", fontWeight: "600"}}
@@ -1004,26 +715,6 @@ function Writing(props) {
                         <span className="smartphone-view-text">
                          <b>🗓️ 오늘의 일기<br/></b>
                             {diary} <br/><br/>
-                            <div className="writing_box">
-                    <Form.Label htmlFor="userInput">
-                       <span className="desktop-view">
-                            ✏️ 일기를 쓰며 느낀점, 들었던 생각, 다짐이 있다면 자유롭게 남겨주세요
-                        </span>
-                        <span className="smartphone-view-text-tiny">
-                            ✏️ 일기를 쓰며 느낀점, 들었던 생각, 다짐이 있다면 자유롭게 남겨주세요
-                        </span>
-                    </Form.Label>
-                    <Form.Control
-                        type="text"
-                        as="textarea"
-                        rows={3}
-                        id="userInput"
-                        value={reflection}
-                        onChange={(e) => setReflection(e.target.value)}
-                    />
-
-                </div>
-
                             <Button
                                 variant="primary"
                                 style={{backgroundColor: "007AFF", fontWeight: "600"}}
@@ -1049,10 +740,6 @@ function Writing(props) {
             <div>
                 {isEvening ? (
                     <Container>
-                        <MyVerticallyCenteredModal_risk
-                            show={modalShow2}
-                            onHide={() => setModalShow2(false)}
-                        />
                         <Row>
                             <div className="loading_box">
                         <span className="desktop-view">
@@ -1070,36 +757,32 @@ function Writing(props) {
                                         variant="primary"
                                         style={{backgroundColor: "007AFF", fontWeight: "600"}}
                                         onClick={() => {
-                                            setSurveyReady(true)
-                                        }}
-                                        /*onClick={async () => {
                                             const newSession = String(Math.floor(Date.now() / 1000));
-                                            await setSession(newSession)
-                                            await createNewDoc(newSession)
-                                            await sendEmail()
-                                        }}*/
-                                    >📝 오늘의 세션 시작하기
+                                            setSession(newSession)
+                                            createNewDoc(newSession)
+                                            sendEmail()
+                                        }}
+                                    >📝 일기 작성하기
                                     </Button>
                                     &nbsp;
-                                    {/*<Form.Text className="text-muted">
+                                    <Form.Text className="text-muted">
                                         종료되지 않은 세션을 이어 진행하려면<br/>아래에서 진행중인 세션을 선택해주세요
-                                    </Form.Text>*/}
+                                    </Form.Text>
                                 </div>
                             </Col>
                             <Col></Col>
                         </Row>
                         &nbsp;
-                        {/*<Row xs={'auto'} md={1} className="g-4">
+                        <Row xs={'auto'} md={1} className="g-4">
                             {existing.map((_, idx) => (
                                 <Col>
                                     <Button
                                         variant="dark"
                                         style={{backgroundColor: "007AFF", fontWeight: "400"}}
-                                        onClick={async () => {
+                                        onClick={() => {
                                             const newSession = String(existing[idx]["sessionStart"]);
-                                            await setSession(newSession)
-                                            await sendEmail(newSession)
-                                            await createNewDoc(newSession)
+                                            setSession(newSession)
+                                            createNewDoc(newSession)
                                         }}>
                                         {Unix_timestamp(existing[idx]["sessionStart"])}
                                     </Button>
@@ -1107,7 +790,7 @@ function Writing(props) {
                             ))}
 
 
-                        </Row>*/}
+                        </Row>
                     </Container>
                 ) : (
                     <Container>
@@ -1215,9 +898,12 @@ function Writing(props) {
             <Container>
                 <Row>
                     <div>
-                        <Badge bg="secondary">
-                            {module}
+                        {/*<Badge bg="primary">
+                            사용자: {props.userName}
                         </Badge>{' '}
+                        <Badge bg="primary">
+                            세션: {session}
+                        </Badge>*/}
 
                         {loading === true ? <Loading/> :
                             <Userinput prompt={prompt} setInputUser={setInputUser} inputUser={inputUser}
@@ -1225,26 +911,20 @@ function Writing(props) {
                                        setLoading={setLoading}
                                        turnCount={turnCount.current} setDiary={setDiary} textInput={textInput}
                                        setTextInput={setTextInput} toggleListening={toggleListening}
-                                       isListening={isListening} setShow={setShow} show={show} module={module} micUsage={micUsage}/>}
+                                       isListening={isListening} setShow={setShow} show={show}/>}
                     </div>
                 </Row>
                 <Row>
-                    {turnCount.current > 3 && loading === false ?
+                    {turnCount.current > 2 && loading === false ?
                         <DiaryView diary={diary} submitDiary={submitDiary} editDiary={editDiary}
                                    setModalShow={setModalShow}/> :
-                        <div>&nbsp;</div>}
+                        <div></div>}
                 </Row>
-
-
-                {/*<Form.Text muted>⚠️ 현재 마음챙김 다이어리는 초기게버전으로, 불완전한 내용을 표시할 수 있습니다.<br/>마음챙김 다이어리의 메시지에 의존하거나 과도하게 수용하지 않는 것이 중요합니다.</Form.Text>*/}
-
                 <MyVerticallyCenteredModal
                     show={modalShow}
                     onHide={() => setModalShow(false)}
                 />
-                <div className="footer"><Form.Text muted>⚠️ 현재 마음챙김 다이어리는 초기버전으로, 불완전한 내용을 표시할 수 있습니다.<br/>인공지능 메시지에 의존하거나 과도하게 수용하지 않는 것이 중요합니다.<br/>완성도에 아쉬움이 있는 경우 다음의 <a
-                    href="http://pf.kakao.com/_xnSPgxj/chat" target="_blank" rel="noopener noreferrer"
-                    style={{textDecoration: 'none', color: '#007AFF'}}>카톡 채널로</a> 피드백을 남겨주세요.</Form.Text></div>
+                <div className="footer"></div>
             </Container>
         )
     }
@@ -1308,17 +988,7 @@ function Userinput(props) {
                             <Button
                                 variant="dark"
                                 style={{backgroundColor: "007AFF", fontWeight: "600"}}
-                                onClick={()=>{
-                                if (props.isListening === false) {
-                                    props.toggleListening()
-                                    props.micUsage.current = props.micUsage.current + 1
-                                }
-                                else {
-                                    props.toggleListening()
-                                }
-
-                                }}>
-                                {/*onClick={props.toggleListening}*/}
+                                onClick={props.toggleListening}>
                                 {props.isListening ? '🛑 응답 종료하기' : '🎙️ 목소리로 응답하기'}
                             </Button>
                         </div>
@@ -1345,23 +1015,13 @@ function Userinput(props) {
                     <Form.Text id="userInput" muted>
                         📖 3턴이 넘어가면 다이어리가 자동으로 생성됩니다.
                     </Form.Text>
-
                 </Row>
                 <div className="smartphone-view">
                     <div className="d-grid gap-2">
                         <Button
                             variant="dark"
                             style={{backgroundColor: "007AFF", fontWeight: "600"}}
-                            onClick={()=>{
-                                if (props.isListening === false) {
-                                    props.toggleListening()
-                                    props.micUsage.current = props.micUsage.current + 1
-                                }
-                                else {
-                                    props.toggleListening()
-                                }
-
-                                }}>
+                            onClick={props.toggleListening}>
                             {props.isListening ? '🛑 응답 종료하기' : '🎙️ 목소리로 응답하기'}
                         </Button>
                         <Button
@@ -1502,45 +1162,6 @@ function DiaryView(props) {
 }
 
 function Loading() {
-
-    const quotes = [
-        "삶이 있는 한 희망은 있다 -키케로",
-        "산다는것 그것은 치열한 전투이다. -로망로랑",
-        "하루에 3시간을 걸으면 7년 후에 지구를 한바퀴 돌 수 있다. -사무엘존슨",
-        "언제나 현재에 집중할수 있다면 행복할것이다. -파울로 코엘료",
-        "신은 용기있는자를 결코 버리지 않는다 -켄러",
-        "피할수 없으면 즐겨라 – 로버트 엘리엇",
-        "단순하게 살아라. 현대인은 쓸데없는 절차와 일 때문에 얼마나 복잡한 삶을 살아가는가?-이드리스 샤흐",
-        "먼저핀꽃은 먼저진다 남보다 먼저 공을 세우려고 조급히 서둘것이 아니다 – 채근담",
-        "행복한 삶을 살기위해 필요한 것은 거의 없다. -마르쿠스 아우렐리우스 안토니우스",
-        "절대 어제를 후회하지 마라 . 인생은 오늘의 나 안에 있고 내일은 스스로 만드는 것이다 L.론허바드",
-        "어리석은 자는 멀리서 행복을 찾고, 현명한 자는 자신의 발치에서 행복을 키워간다 -제임스 오펜하임",
-        "삶이 있는 한 희망은 있다 -키케로",
-        "하루에 3시간을 걸으면 7년 후에 지구를 한바퀴 돌 수 있다. -사무엘존슨",
-        "언제나 현재에 집중할수 있다면 행복할것이다. -파울로 코엘료",
-        "신은 용기있는자를 결코 버리지 않는다 -켄러",
-        "단순하게 살아라. 현대인은 쓸데없는 절차와 일 때문에 얼마나 복잡한 삶을 살아가는가?-이드리스 샤흐",
-        "먼저핀꽃은 먼저진다 남보다 먼저 공을 세우려고 조급히 서둘것이 아니다 – 채근담",
-        "행복한 삶을 살기위해 필요한 것은 거의 없다. -마르쿠스 아우렐리우스 안토니우스",
-        "절대 어제를 후회하지 마라 . 인생은 오늘의 나 안에 있고 내일은 스스로 만드는 것이다 L.론허바드",
-        "어리석은 자는 멀리서 행복을 찾고, 현명한 자는 자신의 발치에서 행복을 키워간다 -제임스 오펜하임",
-        "1퍼센트의 가능성, 그것이 나의 길이다. -나폴레옹",
-        "꿈을 계속 간직하고 있으면 반드시 실현할 때가 온다. -괴테",
-        "화려한 일을 추구하지 말라. 중요한 것은 스스로의 재능이며, 자신의 행동에 쏟아 붓는 사랑의 정도이다. -머더 테레사",
-        "눈물과 더불어 빵을 먹어 보지 않은 자는 인생의 참다운 맛을 모른다. -괴테",
-        "진짜 문제는 사람들의 마음이다. 그것은 절대로 물리학이나 윤리학의 문제가 아니다. -아인슈타인",
-        "해야 할 것을 하라. 모든 것은 타인의 행복을 위해서, 동시에 특히 나의 행복을 위해서이다. -톨스토이",
-        "사람이 여행을 하는 것은 도착하기 위해서가 아니라 여행하기 위해서이다. -괴테",
-        "화가 날 때는 100까지 세라. 최악일 때는 욕설을 퍼부어라. -마크 트웨인",
-        "재산을 잃은 사람은 많이 잃은 것이고, 친구를 잃은 사람은 더많이 잃은 것이며, 용기를 잃은 사람은 모든것을 잃은 것이다. -세르반테스",
-        "돈이란 바닷물과도 같다. 그것은 마시면 마실수록 목이 말라진다. -쇼펜하우어",
-        "이룰수 없는 꿈을 꾸고 이길수 없는 적과 싸우며, 이룰수 없는 사랑을 하고 견딜 수 없는 고통을 견디고, 잡을수 없는 저 하늘의 별도 잡자. -세르반테스",
-        "고개 숙이지 마십시오. 세상을 똑바로 정면으로 바라보십시오. -헬렌 켈러",
-        "고난의 시기에 동요하지 않는 것, 이것은 진정 칭찬받을 만한 뛰어난 인물의 증거다. -베토벤",
-        "사막이 아름다운 것은 어딘가에 샘이 숨겨져 있기 때문이다 – 생떽쥐베리"]
-
-    const randomMessage = quotes[Math.floor(Math.random() * quotes.length)];
-
     return (
         <div>
             <Row>
@@ -1555,12 +1176,6 @@ function Loading() {
                         &nbsp;
                         <div>지금까지의 이야기를<br/>정리중입니다</div>
                     </div>
-                    <span className="desktop-view">
-                             💬 {randomMessage}
-                        </span>
-                    <span className="smartphone-view-text-tiny">
-                             💬 {randomMessage}
-                        </span>
                 </Col>
             </Row>
         </div>

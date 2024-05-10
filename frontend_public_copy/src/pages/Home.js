@@ -8,7 +8,6 @@ import book_blue from "../img/book_blue.jpg";
 import book_purple from "../img/book_purple.jpg";
 import chat from "../img/chat.jpg";
 import lock from "../img/lock.jpg";
-
 import {
     collection,
     doc,
@@ -98,7 +97,7 @@ function Home(props) {
         if (tempArr.length === -1) {
             return tempArr
         } else {
-            setLastDate(tempArr[0]["sessionEnd"])
+            setLastDate(tempArr[tempArr.length - 1]["sessionEnd"])
             return tempArr
         }
 

@@ -16,7 +16,6 @@ export const Auth = (props) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [passwordCheck, setPasswordCheck] = useState("");
-    const [authCode, setAuthCode] = useState("");
     const [username, setUsername] = useState("");
     const [newUser, setNewUser] = useState(false);
 
@@ -53,11 +52,8 @@ export const Auth = (props) => {
     }
 
     const signUpWithEmailPassword = async () => {
-        if (authCode !== "4958") {
-            alert("인증번호가 맞지 않습니다. 최초 설문시 보여진 인증번호를 확인해주세요");
-        }
-        else if (password !== passwordCheck) {
-            alert("입력한 비밀번호가 다릅니다.");
+        if (password !== passwordCheck) {
+            alert("비밀번호가 일치하지 않습니다. 동일한 비밀번호를 입력해주세요");
         } else {
             try {
                 const result = await createUserWithEmailAndPassword(auth, email, password);
@@ -121,10 +117,6 @@ export const Auth = (props) => {
                                 <Form.Control type="password" placeholder="🔑 비밀번호를 한번 더 입력해주세요"
                                               onChange={(e) => setPasswordCheck(e.target.value)}/>
                             </Form.Group>
-                            <Form.Group className="mb-3" controlId="formBasicAuthCode">
-                                <Form.Control type="password" placeholder="🔒 회원가입을 위한 인증코드를 입력해주세요"
-                                              onChange={(e) => setAuthCode(e.target.value)}/>
-                            </Form.Group>
                             <div className="d-grid gap-2">
                                 <Button
                                     variant="primary"
@@ -140,15 +132,17 @@ export const Auth = (props) => {
                             </Form.Text>
                                 </span>
                                 <span className="likebutton" onClick={signInWithGoogle}>
-                            {/*<Form.Text className="text-muted">
-                                <b>Google 계정을</b>이용하여 로그인하고 싶으신가요?
-                            </Form.Text>*/}
+                            <Form.Text className="text-muted">
+                                <b>Google 계정을</b> 이용하여 로그인하고 싶으신가요?
+                            </Form.Text>
                                 </span>
                             </div>
                         </Col>
                         <Col className="desktop-view">
                         </Col>
                     </Row>
+
+
 
                 </Container>
             </div>
@@ -194,23 +188,21 @@ export const Auth = (props) => {
                             style={{backgroundColor: "6c757d", fontWeight: "600"}}
                             onClick={() => {
                                 setNewUser(true)
-                                // alert("현재는 등록된 참가자만 사용이 가능합니다.")
                             }}>
                             새로운 계정 만들기
                         </Button>
                         &nbsp;
-                        {/*<Button
+                        <Button
                             variant="light"
                             style={{backgroundColor: "6c757d", fontWeight: "600"}}
-                            onClick={signInWithGoogle}
-                            >
+                            onClick={signInWithGoogle}>
                             <img
                                 src="https://companieslogo.com/img/orig/GOOG-0ed88f7c.png?t=1633218227"
                                 alt="Google logo"
                                 style={{width: "20px", height: "20px", marginRight: "8px"}}
                             />
                             구글 계정으로 로그인하기
-                        </Button>*/}
+                        </Button>
                         <span className="likebutton" onClick={() => {
                             alert("taewan@kaist.ac.kr 또는 010-9085-2356으로 문의 부탁드립니다.")
                         }}>
