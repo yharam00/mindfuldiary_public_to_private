@@ -5,8 +5,9 @@ React + FastAPI web application utilizing capability of LLM(GPT) generation for 
 ## How to use in local server
 1. made .env file in backend > app
 2. made backend_url.js file in frontend_private > src > pages
-3. in first terminal, made a virtual environment, install packages and activate backend main.py
-4. in second terminal, npm install and start frontend_private
+3. made firebase-config.js in frontend_private > src
+4. in first terminal, made a virtual environment, install packages and activate backend main.py
+5. in second terminal, npm install and start frontend_private
 
 ### make virtual environment and activation
 **Windows**
